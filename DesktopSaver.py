@@ -16,5 +16,5 @@ if __name__ == '__main__':
                     if str(file).split('.')[-1] == getattr(filenames, filenames.order[w])()[0][x]:
                         os.renames(source+file, destination+filenames.order[w]+'/'+file)
                 
-        except Exception as e:
-            print(str(e))
+        except:
+            continue
