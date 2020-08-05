@@ -7,7 +7,7 @@ if __name__ == '__main__':
     directories = os.listdir(source) # Get the whole directory of the source
     for file in directories:
         try:
-            if file == 'DesktopSort.py' or file == '.DS_Store' or file == '.localized': # If-Statement so important files do not get moved
+            if file == 'DesktopSort.py' or file == 'filenames.py' or file == '.DS_Store' or file == '.localized': # If-Statement so important files do not get moved
                 continue
             for w in range(0,12):
                 temp = getattr(filenames, filenames.order[w])()
