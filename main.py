@@ -9,12 +9,12 @@ if __name__ == '__main__':
         try:
             if file == 'DesktopSaver.py' or file == '.DS_Store' or file == '.localized': # If-Statement so important files do not get moved
                 continue
-            for w in range(0,12):
-                temp = getattr(fileData, fileData.order[w])()
+            for w in range(0,12): #
+                temp = getattr(fileData, fileData.order[w])();
                 content, length = temp
                 for x in range(0, length):
                     if str(file).split('.')[-1] == getattr(fileData, fileData.order[w])()[0][x]:
-                        os.renames(source+file, destination+fileData.order[w]+'/'+file)
+                        os.renames(source+file, destination+fileData.order[w]+'/'+file) # Moves file
                 
         except:
             continue
