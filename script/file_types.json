@@ -1,0 +1,70 @@
+{
+    "compressed": {
+        "extensions": ["rar", "zip", "7z", "arj", "deb", "pkg", "rpm", "z", "tar.gz", "gz", "bz2", "xz"],
+        "count": 12
+    },
+    "audio": {
+        "extensions": ["aif", "cda", "mid", "midi", "mp3", "mpa", "ogg", "wav", "wma", "wpl", "aac", "flac", "m4a"],
+        "count": 13
+    },
+    "disc": {
+        "extensions": ["bin", "dmg", "iso", "toast", "vcd", "cue", "nrg", "img"],
+        "count": 8
+    },
+    "data": {
+        "extensions": ["csv", "dat", "db", "dbf", "log", "mdb", "sav", "sql", "tar", "xml", "json", "yaml", "yml", "h5", "pickle"],
+        "count": 15
+    },
+    "email": {
+        "extensions": ["email", "eml", "emlx", "msg", "oft", "ost", "pst", "vcf", "ics"],
+        "count": 9
+    },
+    "executable": {
+        "extensions": ["apk", "bat", "bin", "cgi", "pl", "com", "exe", "gadget", "jar", "msi", "py", "wsf", "sh", "dll", "deb", "app"],
+        "count": 16
+    },
+    "font": {
+        "extensions": ["fnt", "fon", "otf", "ttf", "woff", "woff2"],
+        "count": 6
+    },
+    "pictures": {
+        "extensions": ["jpg", "png", "gif", "webp", "tiff", "psd", "raw", "bmp", "heif", "indd", "jpeg", "psd", "svg", "ps", "ai", "eps"],
+        "count": 16
+    },
+    "presentation": {
+        "extensions": ["key", "odp", "pps", "ppt", "pptx", "pot", "potx"],
+        "count": 7
+    },
+    "spreadsheet": {
+        "extensions": ["ods", "xls", "xlsm", "xlsx", "csv"],
+        "count": 5
+    },
+    "text": {
+        "extensions": ["doc", "docx", "odt", "pdf", "rtf", "tex", "txt", "wpd", "md", "rst"],
+        "count": 10
+    },
+    "video": {
+        "extensions": ["avi", "flv", "h264", "m4v", "mkv", "mov", "mp4", "mpg", "wmv", "webm", "3gp"],
+        "count": 11
+    },
+    "code": {
+        "extensions": ["py", "java", "js", "html", "css", "php", "cpp", "c", "cs", "r", "rb", "go", "swift", "ts", "sh"],
+        "count": 15
+    },
+    "vector_graphics": {
+        "extensions": ["svg", "eps", "ai", "dxf"],
+        "count": 4
+    },
+    "3d_model": {
+        "extensions": ["obj", "stl", "fbx", "gltf", "glb", "3ds", "dae"],
+        "count": 7
+    },
+    "archive": {
+        "extensions": ["7z", "zip", "rar", "tar", "gz", "bz2", "xz"],
+        "count": 7
+    },
+    "web": {
+        "extensions": ["html", "htm", "xhtml", "php", "asp", "aspx", "jsp", "css", "js", "xml"],
+        "count": 10
+    }
+}
