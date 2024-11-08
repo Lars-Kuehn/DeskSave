@@ -14,6 +14,9 @@ The python script and the JSON file lie in this directory.
 ### Planned updates
 - Add more documentation
 
+## Disclaimer
+**Use at Your Own Risk**  
+DeskSave is intended to help organize files, but it may delete or move files incorrectly. Users are advised to thoroughly review the configuration and backup important files before using DeskSave. The author assumes no responsibility for any loss or damage to data.
 
 ## Author
-Lars Kühn
+Lars Kühn [https://github.com/Lars-Kuehn]
