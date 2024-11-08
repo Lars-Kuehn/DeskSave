@@ -3,17 +3,46 @@ import getpass
 import datetime
 import json
 import shutil
+import sys
 
 def load_file_types():
+    """
+    Loads the file types configuration from 'file_types.json'.
+
+    Returns:
+        dict: Data loaded from the JSON file.
+
+    Raises:
+        FileNotFoundError: If the JSON file is missing.
+        json.JSONDecodeError: If the JSON is malformed.
+    """
     # Get the directory where the script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(script_dir, 'file_types.json')
     
     # Open and load the JSON file
-    with open(json_path, 'r') as file:
+    with open(json_path, 'r', encoding='UTF-8') as file:
         return json.load(file)
 
-def move_files(source, destination, file_types, skip_files, skip_folders):
+def move_files(source, destination, file_types, skip_files, skip_folders): # pylint: disable=redefined-outer-name
+    """
+    Moves files and folders from a source directory to a destination directory, 
+    categorizing them based on their file type extensions.
+
+    Folders and files can be skipped based on the provided lists (`skip_files`, `skip_folders`).
+    Files are moved to subdirectories under the destination based on their types.
+    If a folder is empty after moving its contents, it is deleted.
+
+    Args:
+        source (str): The source directory to move files from.
+        destination (str): The destination directory to move files to.
+        file_types (dict): A dictionary mapping file types to their extensions.
+        skip_files (list): A list of file names or extensions to skip.
+        skip_folders (list): A list of folder names to skip.
+
+    Raises:
+        OSError: If a folder cannot be deleted after moving its contents.
+    """
     # Ensure the destination path exists
     if not os.path.exists(destination):
         os.makedirs(destination)
@@ -86,20 +115,20 @@ if __name__ == '__main__':
     
     # Set the source based on user's choice
     if choice == '1':
-        source = allowed_sources['Desktop']
-        source_folder_name = "Desktop"
+        SOURCE = allowed_sources['Desktop']
+        SOURCE_FOLDER_NAME = "Desktop"
     elif choice == '2':
-        source = allowed_sources['Downloads']
-        source_folder_name = "Downloads"
+        SOURCE = allowed_sources['Downloads']
+        SOURCE_FOLDER_NAME = "Downloads"
     else:
         print("Invalid choice. Exiting.")
-        exit(1)
+        sys.exit()
     
     # Get the current date to create a unique destination folder
     date = datetime.datetime.today().strftime("%Y-%m")
     
     # Set the destination directory, creating a subfolder based on the chosen source folder
-    destination = f'/Users/{user}/Documents/OrganizedFiles/{date}/{source_folder_name}/'
+    DESTINATION = f'/Users/{user}/Documents/OrganizedFiles/{date}/{SOURCE_FOLDER_NAME}/'
     
     # Load file type data from JSON
     file_types = load_file_types()
@@ -109,5 +138,5 @@ if __name__ == '__main__':
     skip_folders = ['DeskSave', 'Downloads', 'Documents']  # Add more folder names as needed
     
     # Move files and folders based on type, skipping specified files and folders
-    move_files(source, destination, file_types, skip_files, skip_folders)
+    move_files(SOURCE, DESTINATION, file_types, skip_files, skip_folders)
     print("Organizing complete.")
