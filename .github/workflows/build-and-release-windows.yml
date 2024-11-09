@@ -1,0 +1,47 @@
+name: Build Windows Executable
+
+on:
+  push:
+    tags:
+      - 'v*.*'  # Trigger only for versioned tags like v1.0.0
+
+jobs:
+  build:
+    runs-on: windows-latest  # Specify Windows runner
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.13'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Assuming you have a requirements file that includes PyInstaller
+
+      # Step 4: Change to script directory and build executable with PyInstaller
+      - name: Build Windows executable with PyInstaller
+        run: |
+          cd script
+          pyinstaller --name DeskSaveApp --add-data "file_types.json;." main.py
+
+      # Step 5: Archive the application directory into a zip file
+      - name: Archive application directory
+        run: |
+          cd script/dist
+          powershell Compress-Archive -Path DeskSaveApp -DestinationPath DeskSaveApp-Windows.zip
+
+      # Step 6: Upload the zip archive as a release asset
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')  # Only run this on tags
+        with:
+          files: |
+            script/dist/DeskSaveApp-Windows.zip
