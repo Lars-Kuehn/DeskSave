@@ -8,9 +8,6 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest  # Use GitHub runner for Ubuntu to handle matrix
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest]  # Define matrix strategy for macOS and Windows
     steps:
       # Step 1: Checkout the code
       - name: Checkout code
@@ -31,13 +28,8 @@ jobs:
       # Step 4: Build the executable using PyInstaller for the target OS
       - name: Build executable with PyInstaller
         run: |
-          pip install pyinstaller
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json:." script/main.py
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json;." script/main.py
-          fi
-
+          pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json:script/" script/main.py
+          
       # Step 5: Upload the generated executables as release assets
       - name: Release
         uses: softprops/action-gh-release@v2
