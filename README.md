@@ -1,6 +1,11 @@
 # DeskSave
 This application is able to move your files from your desktop or download folder to your Documents and structures them according to the data-type. 
 
+## What is the DeskSave capable of?
+- **Graphical User Interface**: The application is run trough an GUI.
+- **JSON configuration file**: `\script\file_types.json` contains all of the file-types that are being recognised by the application.
+- **CI/CD**: This repository contains an CI/CD pipeline that checks if all of its python code is being correct via *Pylint*.
+
 ## `\script`
 The python script and the JSON file lie in this directory.
 ### Files
@@ -9,10 +14,11 @@ The python script and the JSON file lie in this directory.
 
 ## Roadmap for DeskSave
 ### Currently in development
-- Graphical User Interface & Executable File
+- **Executable File**: Launch DeskSave via one executable file.
 
 ### Planned updates
-- Add more documentation
+- **Select directory**: The user should be able to Source- and Destination Folder.
+- **Settings**: The user should be able to change the Settings of the application in the GUI.
 
 ## Disclaimer
 **Use at Your Own Risk**  
