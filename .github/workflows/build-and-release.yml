@@ -33,9 +33,9 @@ jobs:
         run: |
           pip install pyinstaller
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json:." script/main.py
+            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json" script/main.py
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json;." script/main.py
+            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json" script/main.py
           fi
 
       # Step 5: Upload the generated executables as release assets
