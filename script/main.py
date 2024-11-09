@@ -5,7 +5,7 @@ import json
 import shutil
 import sys
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import messagebox, ttk
 
 class DeskSaveApp(tk.Tk):
     """
