@@ -25,16 +25,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Assuming you have a requirements file
 
-      # Step 4: Change to script directory and build executable using PyInstaller
+      # Step 4: Install PyInstaller
+      - name: Install PyInstaller
+        run: |
+          python -m pip install pyinstaller
+
+      # Step 5: Change to script directory and build executable using PyInstaller
       - name: Change to script directory and Build executable with PyInstaller
         run: |
           cd script
           pyinstaller --name DeskSaveApp --onefile --add-data "file_types.json:." main.py
           
-      # Step 5: Upload the generated executables as release assets
+      # Step 6: Upload the generated executables as release assets
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')  # Only run this on tags
         with:
           files: |
-            script/dist/DeskSaveApp
+            script/dist/DeskSaveApp.exe
