@@ -38,11 +38,12 @@ jobs:
       # Step 5: Archive the application directory into a zip file
       - name: Archive application directory
         run: |
-          cd dist
+          cd script/dist
           if [[ "${{ matrix.os }}" == 'windows-latest' ]]; then
             zip -r DeskSaveApp-Windows.zip DeskSaveApp
           else
             zip -r DeskSaveApp-macOS.zip DeskSaveApp
+          fi
 
       # Step 6: Upload the zip archives as release assets
       - name: Release
