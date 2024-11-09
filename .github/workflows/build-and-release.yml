@@ -3,32 +3,37 @@ name: Build And Release
 on:
   push:
     tags:
-      - 'v*.*'   # Only trigger for versioned tags like v1.0.0
+      - 'v*.*'   # Trigger only for versioned tags like v1.0.0
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.13'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Assumes you have a requirements file
+          pip install -r requirements.txt  # Assuming you have a requirements file
 
+      # Step 4: Build the executable using PyInstaller
       - name: Build executable with PyInstaller
         run: |
           pip install pyinstaller
-          pyinstaller --onefile --noconsole script/desksave.py
+          pyinstaller --name DeskSaveApp --onefile --noconsole script/main.py
 
+      # Step 5: Upload the generated executable as a release asset
       - name: Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')  # Only run this on tags
         with:
-          files: ./dist/desksave  # Path to the executable created by PyInstaller
+          files: ./dist/DeskSaveApp  # Path to the executable created by PyInstaller
