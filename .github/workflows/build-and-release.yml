@@ -24,7 +24,6 @@ jobs:
           python-version: '3.13'
 
       # Step 3: Install dependencies
-      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Assuming you have a requirements file that includes PyInstaller
@@ -39,10 +38,10 @@ jobs:
       - name: Archive application directory
         run: |
           cd script/dist
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             # Windows uses PowerShell, so we switch to PowerShell commands for zipping
             powershell Compress-Archive -Path DeskSaveApp -DestinationPath DeskSaveApp-Windows.zip
-          else
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # macOS or Linux, use the 'zip' command
             zip -r DeskSaveApp-macOS.zip DeskSaveApp
           fi
