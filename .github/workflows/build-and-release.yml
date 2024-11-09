@@ -25,10 +25,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Assuming you have a requirements file
 
-      # Step 4: Build the executable using PyInstaller for the target OS
-      - name: Build executable with PyInstaller
+      # Step 4: Change to script directory and build executable using PyInstaller
+      - name: Change to script directory and Build executable with PyInstaller
         run: |
-          pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json:script/" script/main.py
+          cd script
+          pyinstaller --name DeskSaveApp --onefile --add-data "file_types.json:." main.py
           
       # Step 5: Upload the generated executables as release assets
       - name: Release
@@ -36,5 +37,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')  # Only run this on tags
         with:
           files: |
-            ./dist/DeskSaveApp   # macOS app file
-            ./dist/DeskSaveApp.exe  # Windows .exe file
+            script/dist/DeskSaveApp

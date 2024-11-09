@@ -71,6 +71,8 @@ class DeskSaveApp(tk.Tk):
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             json_path = os.path.join(script_dir, 'file_types.json')
+            logging.info(f"Loading file types from: {json_path}")
+            print(f"Loading file types from: {json_path}")
             with open(json_path, 'r', encoding='UTF-8') as file:
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
@@ -220,5 +222,16 @@ class DeskSaveApp(tk.Tk):
                         break
 
 if __name__ == '__main__':
+    import sys
+    import logging
+
+    # Set up logging to a file
+    log_file = "app_log.txt"
+    logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(message)s')
+
+    # Redirect print statements to the log file
+    sys.stdout = open(log_file, 'a')
+    sys.stderr = sys.stdout  # Optional, redirect stderr to the same file
+
     app = DeskSaveApp()
     app.mainloop()
