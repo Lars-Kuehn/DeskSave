@@ -8,7 +8,33 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 class DeskSaveApp(tk.Tk):
+    """
+    DeskSaveApp is a Tkinter-based graphical user interface application for organizing 
+    files by moving them from specified source folders (Desktop or Downloads) to 
+    categorized directories based on file types within the user's Documents folder.
+
+    This application loads a configuration of file types from a JSON file and provides 
+    options for the user to select the source directory and initiate the file 
+    organization process. It uses a dark theme with blue accents for visual styling.
+
+    Attributes:
+        file_types (dict): A dictionary of file type categories and their associated 
+            file extensions, loaded from 'file_types.json'.
+        user (str): The current user's username, used to determine source and 
+            destination directories.
+        allowed_sources (dict): A dictionary of allowed source directories 
+            (Desktop and Downloads) specific to the user.
+    """
     def __init__(self):
+        """
+        Initializes the DeskSaveApp GUI application. Sets up the main window's 
+        appearance, loads file type configurations, defines the allowed source 
+        directories for the current user, and initializes the GUI widgets.
+        
+        Raises:
+            SystemExit: If the file type configuration file cannot be loaded due 
+            to being missing or incorrectly formatted.
+        """
         super().__init__()
         self.title("DeskSave")
         self.configure(bg="#1e1e1e")
@@ -28,6 +54,20 @@ class DeskSaveApp(tk.Tk):
         self.create_widgets()
     
     def load_file_types(self):
+        """
+        Loads file type configurations from 'file_types.json' located in the same 
+        directory as the script. The JSON file should contain a dictionary that maps 
+        file type categories to their associated file extensions, which is used to 
+        organize files by type in the application.
+
+        Returns:
+            dict: A dictionary where keys represent file type categories (e.g., 'Images', 
+            'Documents') and values are lists of associated file extensions.
+
+        Raises:
+            SystemExit: If 'file_types.json' is missing or has an invalid JSON format. 
+                Displays an error message to the user before exiting.
+        """
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             json_path = os.path.join(script_dir, 'file_types.json')
@@ -38,6 +78,19 @@ class DeskSaveApp(tk.Tk):
             sys.exit()
     
     def create_widgets(self):
+        """
+        Creates and arranges the graphical user interface (GUI) components for the DeskSaveApp.
+
+        This includes setting up labels, dropdowns, buttons, and a text area to display
+        progress. The GUI components allow the user to select a source folder, start
+        the file organization process, and view a log of actions taken during execution.
+
+        Components:
+            - Title label displaying the application name.
+            - Dropdown menu for selecting the source folder (Desktop or Downloads).
+            - Organize button to initiate the file organization.
+            - Progress text area to show real-time updates on files being moved or skipped.
+        """
         # Title Label
         title_label = tk.Label(self, text="DeskSave", font=("Arial", 24), fg="#1e90ff", bg="#1e1e1e")
         title_label.pack(pady=20)
@@ -60,12 +113,34 @@ class DeskSaveApp(tk.Tk):
         self.progress_text.pack(pady=10)
         
     def log_progress(self, message):
+        """
+        Logs a message to the progress text area within the GUI.
+
+        Args:
+            message (str): The message to display in the progress text area.
+        
+        Side Effects:
+            Updates the progress text area with the provided message, automatically
+            scrolling to the latest entry.
+        """
         self.progress_text.config(state="normal")
         self.progress_text.insert(tk.END, f"{message}\n")
         self.progress_text.config(state="disabled")
         self.progress_text.see(tk.END)
         
     def organize_files(self):
+        """
+        Handles the file organization process based on the selected source folder.
+
+        This method retrieves the user's choice from the dropdown menu, constructs a
+        destination path within the user's Documents folder, and defines files and
+        folders to skip. Then, it calls `move_files` to categorize and move files
+        according to the loaded file type configurations.
+
+        Side Effects:
+            - Displays progress messages in the text area.
+            - Shows an information dialog box upon completion.
+        """
         choice = self.source_var.get()
         source = self.allowed_sources[choice]
         
@@ -80,6 +155,32 @@ class DeskSaveApp(tk.Tk):
         messagebox.showinfo("Completed", "Organizing complete.")
     
     def move_files(self, source, destination, file_types, skip_files, skip_folders):
+        """
+        Moves and organizes files from the source directory to the destination directory,
+        categorizing them based on their file types and the configuration specified in
+        'file_types.json'.
+
+        Files and folders can be excluded from the organization process based on the
+        `skip_files` and `skip_folders` lists. After moving files, it attempts to delete
+        any empty folders left in the source directory.
+
+        Args:
+            source (str): The directory to move files from.
+            destination (str): The directory to move files to, with subdirectories
+                organized by file type.
+            file_types (dict): A dictionary that maps file types to their extensions.
+            skip_files (list): List of file names or extensions to skip.
+            skip_folders (list): List of folder names to skip.
+
+        Side Effects:
+            - Creates destination folders if they do not already exist.
+            - Moves files and deletes empty folders in the source directory.
+            - Logs progress messages to the GUI text area.
+        
+        Raises:
+            OSError: If unable to delete an empty folder, logs an error message but
+            continues the process for other files and folders.
+        """
         if not os.path.exists(destination):
             os.makedirs(destination)
         
