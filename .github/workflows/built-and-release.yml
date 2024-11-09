@@ -1,0 +1,39 @@
+name: Build and Release Executable
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Build executable with PyInstaller
+        run: |
+          pip install pyinstaller
+          pyinstaller --onefile --noconsole script/main.py  # Adjust command for your main script
+
+      - name: Upload to GitHub Releases
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_id: ${{ github.event.release.id }}
+          asset_path: ./dist/deskSave  # Path to the built executable
+          asset_name: deskSave  # Name as it will appear in the release
+          asset_content_type: application/octet-stream
