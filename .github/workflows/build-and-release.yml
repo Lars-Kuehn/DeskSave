@@ -38,7 +38,7 @@ jobs:
       - name: Change to script directory and Build executable directory with PyInstaller
         run: |
           cd script
-          pyinstaller --name DeskSaveApp --add-data "file_types.json:." main.py  # omits --onefile
+          pyinstaller --name DeskSaveApp --add-data "file_types.json:." main.py
 
       # Step 6: Archive the application directory into a zip file
       - name: Archive application directory
