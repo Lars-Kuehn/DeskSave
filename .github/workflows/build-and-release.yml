@@ -7,7 +7,10 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use GitHub runner for Ubuntu to handle matrix
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]  # Define matrix strategy for macOS and Windows
     steps:
       # Step 1: Checkout the code
       - name: Checkout code
@@ -25,15 +28,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Assuming you have a requirements file
 
-      # Step 4: Build the executable using PyInstaller
+      # Step 4: Build the executable using PyInstaller for the target OS
       - name: Build executable with PyInstaller
         run: |
           pip install pyinstaller
-          pyinstaller --name DeskSaveApp --onefile --noconsole script/main.py
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json:." script/main.py
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            pyinstaller --name DeskSaveApp --onefile --noconsole --add-data "script/file_types.json;." script/main.py
+          fi
 
-      # Step 5: Upload the generated executable as a release asset
+      # Step 5: Upload the generated executables as release assets
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')  # Only run this on tags
         with:
-          files: ./dist/DeskSaveApp  # Path to the executable created by PyInstaller
+          files: |
+            ./dist/DeskSaveApp   # macOS app file
+            ./dist/DeskSaveApp.exe  # Windows .exe file
