@@ -38,7 +38,7 @@ jobs:
       # Step 5: Archive the application directory into a zip file
       - name: Archive application directory
         run: |
-          cd script/dist
+          cd dist
           if [[ "${{ matrix.os }}" == 'windows-latest' ]]; then
             zip -r DeskSaveApp-Windows.zip DeskSaveApp
           else
