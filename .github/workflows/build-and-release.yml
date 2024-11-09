@@ -7,7 +7,11 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest  # Use GitHub runner for Ubuntu to handle matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]  # Specify macOS and Windows runners
+
     steps:
       # Step 1: Checkout the code
       - name: Checkout code
@@ -30,16 +34,25 @@ jobs:
         run: |
           python -m pip install pyinstaller
 
-      # Step 5: Change to script directory and build executable using PyInstaller
-      - name: Change to script directory and Build executable with PyInstaller
+      # Step 5: Change to script directory and build executable directory with PyInstaller
+      - name: Change to script directory and Build executable directory with PyInstaller
         run: |
           cd script
-          pyinstaller --name DeskSaveApp --onefile --add-data "file_types.json:." main.py
-          
-      # Step 6: Upload the generated executables as release assets
+          pyinstaller --name DeskSaveApp --add-data "file_types.json:." main.py  # omits --onefile
+
+      # Step 6: Archive the application directory into a zip file
+      - name: Archive application directory
+        run: |
+          cd script/dist
+          if [[ "${{ matrix.os }}" == 'windows-latest' ]]; then
+            zip -r DeskSaveApp-Windows.zip DeskSaveApp
+          else
+            zip -r DeskSaveApp-macOS.zip DeskSaveApp
+
+      # Step 7: Upload the zip archives as release assets
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')  # Only run this on tags
         with:
           files: |
-            script/dist/DeskSaveApp.exe
+            script/dist/DeskSaveApp-*.zip
