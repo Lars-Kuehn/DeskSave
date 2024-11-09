@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Assuming you have a requirements file
+          pip install -r requirements.txt  # Assuming you have a requirements file that includes PyInstaller
 
       # Step 4: Change to script directory and build executable directory with PyInstaller
       - name: Change to script directory and Build executable directory with PyInstaller
@@ -39,9 +39,11 @@ jobs:
       - name: Archive application directory
         run: |
           cd script/dist
-          if [[ "${{ matrix.os }}" == 'windows-latest' ]]; then
-            zip -r DeskSaveApp-Windows.zip DeskSaveApp
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            # Windows uses PowerShell, so we switch to PowerShell commands for zipping
+            powershell Compress-Archive -Path DeskSaveApp -DestinationPath DeskSaveApp-Windows.zip
           else
+            # macOS or Linux, use the 'zip' command
             zip -r DeskSaveApp-macOS.zip DeskSaveApp
           fi
 
