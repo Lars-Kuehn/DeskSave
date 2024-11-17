@@ -1,3 +1,5 @@
+""" This module contains all the logic involving the DeskSave GUI and Algorithm"""
+
 import os
 import getpass
 import datetime
@@ -5,9 +7,9 @@ import json
 import shutil
 import sys
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, filedialog
 
-class DeskSaveApp(tk.Tk):
+class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
     """
     DeskSaveApp is a Tkinter-based graphical user interface application for organizing 
     files by moving them from specified source folders (Desktop or Downloads) to 
@@ -26,52 +28,184 @@ class DeskSaveApp(tk.Tk):
             (Desktop and Downloads) specific to the user.
     """
     def __init__(self):
-        """
-        Initializes the DeskSaveApp GUI application. Sets up the main window's 
-        appearance, loads file type configurations, defines the allowed source 
-        directories for the current user, and initializes the GUI widgets.
-        
-        Raises:
-            SystemExit: If the file type configuration file cannot be loaded due 
-            to being missing or incorrectly formatted.
-        """
         super().__init__()
         self.title("DeskSave")
         self.configure(bg="#1e1e1e")
         self.geometry("600x400")
-        
+
+        # Initialize the default JSON configuration path
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.default_json_path = os.path.join(self.script_dir, 'file_types.json')
+        self.custom_json_path = None  # Holds the path to the custom JSON file if uploaded
+
         # Load file types
         self.file_types = self.load_file_types()
-        
+
         # Set up source options
         self.user = getpass.getuser()
         self.allowed_sources = {
             'Desktop': f'/Users/{self.user}/Desktop',
             'Downloads': f'/Users/{self.user}/Downloads'
         }
-        
+
+        # Create Menus
+        self.create_menus()
+
         # Set up GUI
         self.create_widgets()
-    
+
+    def create_menus(self):
+        """
+        Creates the main menu bar with cascading submenus.
+        """
+        menu_bar = tk.Menu(self)
+
+        # Settings Menu
+        settings_menu = tk.Menu(menu_bar, tearoff=0)
+        
+        # Config Submenu
+        config_menu = tk.Menu(settings_menu, tearoff=0)
+        config_menu.add_command(label="Upload Custom Config", command=self.upload_custom_config)
+        config_menu.add_command(label="Remove Custom Config", command=self.remove_custom_config)
+        config_menu.add_command(label="About Config Syntax", command=self.about_custom_config)
+
+        # Add Config submenu to Settings
+        settings_menu.add_cascade(label="Config", menu=config_menu)
+
+        # Add Settings to Menu Bar
+        menu_bar.add_cascade(label="Settings", menu=settings_menu)
+
+        # About Menu
+        menu_bar.add_command(label="About", command=self.show_about)
+
+                # About Menu
+        about_menu = tk.Menu(menu_bar, tearoff=0)
+        about_menu.add_command(label="About DeskSave", command=self.show_about)
+        menu_bar.add_cascade(label="About", menu=about_menu)
+
+        # Attach Menu Bar to the App
+        self.config(menu=menu_bar)
+
+
+    def upload_custom_config(self):
+        """
+        Allows the user to upload a custom JSON file for file type configuration.
+        The uploaded file will be used instead of the default configuration.
+        """
+        # Prompt the user to select a JSON file
+        file_path = filedialog.askopenfilename(
+            title="Select a JSON Configuration File",
+            filetypes=[("JSON Files", "*.json"), ("All Files", "*.*")]
+        )
+
+        if file_path:
+            try:
+                # Validate the JSON format
+                with open(file_path, 'r', encoding='UTF-8') as new_file:
+                    new_config = json.load(new_file)
+
+                # Set the custom JSON file as the active configuration
+                self.custom_json_path = file_path
+                self.file_types = new_config
+                messagebox.showinfo("Preferences", "Custom configuration loaded successfully!")
+
+            except json.JSONDecodeError:
+                messagebox.showerror("Invalid File", "The selected file is not a valid JSON configuration.")
+            except Exception as e: # pylint: disable=broad-exception-caught
+                messagebox.showerror("Error", f"An error occurred: {e}")
+
+    def remove_custom_config(self):
+        """
+        Removes the custom configuration and reverts to the default JSON configuration.
+        """
+        if self.custom_json_path:
+            self.custom_json_path = None
+            self.file_types = self.load_file_types()
+            messagebox.showinfo("Preferences", "Reverted to the default configuration.")
+        else:
+            messagebox.showinfo("Preferences", "No custom configuration to remove.")
+
+    def about_custom_config(self):
+        """
+        Displays information about the syntax of the JSON configuration file in a formatted way,
+        along with an explanation of each field's purpose, using a custom Toplevel window.
+        """
+        json_example = {
+            "Images": {"extensions": ["jpg", "png", "gif"]},
+            "Documents": {"extensions": ["pdf", "docx", "txt"]},
+            "Videos": {"extensions": ["mp4", "mkv", "avi"]},
+        }
+
+        formatted_json = json.dumps(json_example, indent=4)
+
+        explanation = (
+            "Explanation of JSON fields:\n\n"
+            "1. Each top-level key (e.g., 'Images', 'Documents') represents a category. This category also represents the folder name.\n"
+            "2. Under each category, the 'extensions' field specifies a list of file extensions that belong to that category.\n"
+            "3. The extensions should not include the leading dot (e.g., 'jpg' not '.jpg').\n\n"
+            "The application uses this configuration to sort files into the specified categories."
+        )
+
+        # Create a Toplevel window
+        about_window = tk.Toplevel(self)
+        about_window.title("About Config")
+        about_window.geometry("600x500")
+        about_window.configure(bg="#1e1e1e")
+
+        # Title Label
+        title_label = tk.Label(
+            about_window,
+            text="Configuration File Syntax",
+            font=("Arial", 16),
+            fg="#1e90ff",
+            bg="#1e1e1e"
+        )
+        title_label.pack(pady=10)
+
+        # Text widget to display JSON and explanation
+        text_area = tk.Text(about_window, wrap=tk.WORD, bg="#252526", fg="white", font=("Courier", 12))
+        text_area.insert(tk.END, "The configuration file should follow this syntax:\n\n")
+        text_area.insert(tk.END, formatted_json + "\n\n")
+        text_area.insert(tk.END, explanation)
+        text_area.config(state=tk.DISABLED)  # Make the text area read-only
+        text_area.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+        # Close button
+        close_button = tk.Button(
+            about_window,
+            text="Close",
+            command=about_window.destroy,
+            bg="#1e90ff",
+            fg="black",
+            font=("Arial", 12)
+        )
+        close_button.pack(pady=10)
+
+    def show_about(self):
+        """
+        Displays information about the application, including its version.
+        """
+        app_version = os.getenv("APP_VERSION", "NO-STABLE-RELEASE")
+        messagebox.showinfo(
+            "About DeskSave",
+            f"DeskSave {app_version}\n\nAn application to organize your files effortlessly!"
+        )
+
     def load_file_types(self):
         """
-        Loads file type configurations from 'file_types.json' located in the same 
-        directory as the script. The JSON file should contain a dictionary that maps 
-        file type categories to their associated file extensions, which is used to 
-        organize files by type in the application.
+        Loads file type configurations from the active JSON configuration file.
+        If a custom JSON file is not provided, it defaults to the original 'file_types.json'.
 
         Returns:
             dict: A dictionary where keys represent file type categories (e.g., 'Images', 
             'Documents') and values are lists of associated file extensions.
 
         Raises:
-            SystemExit: If 'file_types.json' is missing or has an invalid JSON format. 
-                Displays an error message to the user before exiting.
+            SystemExit: If the active configuration file is missing or has an invalid format.
         """
+        active_path = self.custom_json_path or self.default_json_path
         try:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            json_path = os.path.join(script_dir, 'file_types.json')
-            with open(json_path, 'r', encoding='UTF-8') as file:
+            with open(active_path, 'r', encoding='UTF-8') as file:
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             messagebox.showerror("Error", "Failed to load file types configuration.")

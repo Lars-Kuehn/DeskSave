@@ -1,70 +1,53 @@
 {
     "compressed": {
-        "extensions": ["rar", "zip", "7z", "arj", "deb", "pkg", "rpm", "z", "tar.gz", "gz", "bz2", "xz"],
-        "count": 12
-    },
+        "extensions": ["rar", "zip", "7z", "arj", "deb", "pkg", "rpm", "z", "tar.gz", "gz", "bz2", "xz"]
+        },
     "audio": {
-        "extensions": ["aif", "cda", "mid", "midi", "mp3", "mpa", "ogg", "wav", "wma", "wpl", "aac", "flac", "m4a"],
-        "count": 13
+        "extensions": ["aif", "cda", "mid", "midi", "mp3", "mpa", "ogg", "wav", "wma", "wpl", "aac", "flac", "m4a"]
     },
     "disc": {
-        "extensions": ["bin", "dmg", "iso", "toast", "vcd", "cue", "nrg", "img"],
-        "count": 8
-    },
+        "extensions": ["bin", "dmg", "iso", "toast", "vcd", "cue", "nrg", "img"]
+        },
     "data": {
-        "extensions": ["csv", "dat", "db", "dbf", "log", "mdb", "sav", "sql", "tar", "xml", "json", "yaml", "yml", "h5", "pickle"],
-        "count": 15
+        "extensions": ["csv", "dat", "db", "dbf", "log", "mdb", "sav", "sql", "tar", "xml", "json", "yaml", "yml", "h5", "pickle"]
     },
     "email": {
-        "extensions": ["email", "eml", "emlx", "msg", "oft", "ost", "pst", "vcf", "ics"],
-        "count": 9
+        "extensions": ["email", "eml", "emlx", "msg", "oft", "ost", "pst", "vcf", "ics"]
     },
     "executable": {
-        "extensions": ["apk", "bat", "bin", "cgi", "pl", "com", "exe", "gadget", "jar", "msi", "py", "wsf", "sh", "dll", "deb", "app"],
-        "count": 16
+        "extensions": ["apk", "bat", "bin", "cgi", "pl", "com", "exe", "gadget", "jar", "msi", "py", "wsf", "sh", "dll", "deb", "app"]
     },
     "font": {
-        "extensions": ["fnt", "fon", "otf", "ttf", "woff", "woff2"],
-        "count": 6
+        "extensions": ["fnt", "fon", "otf", "ttf", "woff", "woff2"]
     },
     "pictures": {
-        "extensions": ["jpg", "png", "gif", "webp", "tiff", "psd", "raw", "bmp", "heif", "indd", "jpeg", "psd", "svg", "ps", "ai", "eps"],
-        "count": 16
+        "extensions": ["jpg", "png", "gif", "webp", "tiff", "psd", "raw", "bmp", "heif", "indd", "jpeg", "psd", "svg", "ps", "ai", "eps"]
     },
     "presentation": {
-        "extensions": ["key", "odp", "pps", "ppt", "pptx", "pot", "potx"],
-        "count": 7
+        "extensions": ["key", "odp", "pps", "ppt", "pptx", "pot", "potx"]
     },
     "spreadsheet": {
-        "extensions": ["ods", "xls", "xlsm", "xlsx", "csv"],
-        "count": 5
+        "extensions": ["ods", "xls", "xlsm", "xlsx", "csv"]
     },
     "text": {
-        "extensions": ["doc", "docx", "odt", "pdf", "rtf", "tex", "txt", "wpd", "md", "rst"],
-        "count": 10
+        "extensions": ["doc", "docx", "odt", "pdf", "rtf", "tex", "txt", "wpd", "md", "rst"]
     },
     "video": {
-        "extensions": ["avi", "flv", "h264", "m4v", "mkv", "mov", "mp4", "mpg", "wmv", "webm", "3gp"],
-        "count": 11
+        "extensions": ["avi", "flv", "h264", "m4v", "mkv", "mov", "mp4", "mpg", "wmv", "webm", "3gp"]
     },
     "code": {
-        "extensions": ["py", "java", "js", "html", "css", "php", "cpp", "c", "cs", "r", "rb", "go", "swift", "ts", "sh"],
-        "count": 15
+        "extensions": ["py", "java", "js", "html", "css", "php", "cpp", "c", "cs", "r", "rb", "go", "swift", "ts", "sh"]
     },
     "vector_graphics": {
-        "extensions": ["svg", "eps", "ai", "dxf"],
-        "count": 4
+        "extensions": ["svg", "eps", "ai", "dxf"]
     },
     "3d_model": {
-        "extensions": ["obj", "stl", "fbx", "gltf", "glb", "3ds", "dae"],
-        "count": 7
+        "extensions": ["obj", "stl", "fbx", "gltf", "glb", "3ds", "dae"]
     },
     "archive": {
-        "extensions": ["7z", "zip", "rar", "tar", "gz", "bz2", "xz"],
-        "count": 7
+        "extensions": ["7z", "zip", "rar", "tar", "gz", "bz2", "xz"]
     },
     "web": {
-        "extensions": ["html", "htm", "xhtml", "php", "asp", "aspx", "jsp", "css", "js", "xml"],
-        "count": 10
+        "extensions": ["html", "htm", "xhtml", "php", "asp", "aspx", "jsp", "css", "js", "xml"]
     }
 }
