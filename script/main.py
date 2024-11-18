@@ -256,15 +256,19 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
     def show_about(self):
         """
-        Displays information about the DeskSave application.
+        Displays information about the DeskSave application, including the version.
+        Retrieves the version from the environment variable APP_VERSION set during the build process.
         """
+        app_version = os.getenv("APP_VERSION", "NO_OFFICIAL_RELEASE") # Defaults to NOR if not run from the official executables
+
         about_message = (
-            "DeskSave Application\n\n"
-            "Version 1.0\n"
+            f"DeskSave Application\n\n"
+            f"Version {app_version}\n"
             "A simple file organization tool for sorting files into predefined categories based on their extensions.\n"
             "Developed by Lars Kühn."
         )
         messagebox.showinfo("About DeskSave", about_message)
+
 
     def create_widgets(self):
         """
