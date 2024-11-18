@@ -1,3 +1,5 @@
+"""DeskSave Module"""
+
 import os
 import getpass
 import datetime
@@ -76,7 +78,6 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         config_menu.add_command(label="Upload Custom Config", command=self.upload_custom_config)
         config_menu.add_command(label="Remove Custom Config", command=self.remove_custom_config)
         config_menu.add_command(label="About Config Syntax", command=self.about_custom_config)
-
 
         # Path Submenu
         path_menu = tk.Menu(settings_menu, tearoff=0)
@@ -236,7 +237,6 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
             messagebox.showinfo("Destination Changed", f"Destination path has been set to:\n{new_destination_path}")
         else:
             messagebox.showinfo("Destination Not Changed", "No destination path was selected.")
-
 
     def about_paths(self):
         """
