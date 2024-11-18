@@ -32,7 +32,7 @@ jobs:
           APP_VERSION: ${{ github.ref_name }}  # Pass the tag name as an environment variable
         run: |
           cd script
-          pyinstaller --name DeskSaveApp --noconsole --add-data "file_types.json:." --additional-hooks-dir=hooks --clean main.py
+          pyinstaller --name DeskSaveApp --target-arch x86_64 --noconsole --add-data "file_types.json:." --additional-hooks-dir=hooks --clean main.py
 
       # Step 5: Archive the application directory into a zip file
       - name: Archive application directory
