@@ -1,0 +1,10 @@
+{
+    "skip_files": [
+        ".DS_Store",
+        ".localized"
+    ],
+    "skip_folders": [
+        "DeskSave",
+        "DeskSaveApp"
+    ]
+}
