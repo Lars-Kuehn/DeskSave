@@ -337,7 +337,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
         # Add new ignore entries
         
-        def save_ignore_data(self):
+        def save_data():
             """Saves the ignore data (files and folders) to the ignore JSON file."""
             # Get the new ignore files and folders from the input fields
             new_ignore_files = ignore_files_entry.get().split(',') if ignore_files_entry.get() else []
@@ -367,7 +367,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         save_button = tk.Button(
             ignore_window,
             text="Save Changes",
-            command=save_ignore_data,
+            command=save_data,
             bg="#1e90ff",
             fg="black",
             font=("Arial", 12)
@@ -375,7 +375,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         save_button.pack(pady=10)
 
         # Revert to default button
-        def revert_to_default(self):
+        def revert_to_default():
             """
             Reverts the ignore settings to their default values and updates the JSON file.
             """
