@@ -1,4 +1,4 @@
-"""DeskSave Module"""
+"""DeskSave Module""" # pylint: disable=too-many-lines
 
 import os
 import getpass
@@ -9,6 +9,7 @@ import sys
 import tkinter as tk
 from tkinter import messagebox, ttk, filedialog
 from datetime import datetime
+import pyperclip
 
 class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
     """
@@ -30,9 +31,17 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
     """
     def __init__(self):
         super().__init__()
+        # Color Palette
+        # Color Palette
+        self.background = "#040D12"  # Dark background
+        self.boxes = "#183D3D"  # Widget background
+        self.menu = "#5C8374"  # Menu and button accents
+        self.text = "#EEEEEE"  # Primary text color
+
+        # App Configuration
         self.title("DeskSave")
-        self.configure(bg="#1e1e1e")
-        self.geometry("600x400")
+        self.configure(bg=self.background)
+        self.geometry("800x600")
 
         # Initialize the default JSON configuration path
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -81,7 +90,8 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         config_menu = tk.Menu(settings_menu, tearoff=0)
         config_menu.add_command(label="Upload Custom Config", command=self.upload_custom_config)
         config_menu.add_command(label="Remove Custom Config", command=self.remove_custom_config)
-        config_menu.add_command(label="About Config Syntax", command=self.about_custom_config)
+        config_menu.add_command(label="Config Syntax", command=self.syntax_config)
+        config_menu.add_command(label="About Config", command=self.about_config)
 
         # Path Submenu
         path_menu = tk.Menu(settings_menu, tearoff=0)
@@ -105,13 +115,12 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         # About Menu
         menu_bar.add_command(label="About", command=self.show_about)
 
-                # About Menu
-        about_menu = tk.Menu(menu_bar, tearoff=0)
-        about_menu.add_command(label="About DeskSave", command=self.show_about)
-        menu_bar.add_cascade(label="About", menu=about_menu)
-
         # Attach Menu Bar to the App
         self.config(menu=menu_bar)
+
+    #
+    # CUSTOM CONFIG
+    #
 
     def upload_custom_config(self):
         """
@@ -151,11 +160,12 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         else:
             messagebox.showinfo("Preferences", "No custom configuration to remove.")
 
-    def about_custom_config(self):
+    def syntax_config(self):
         """
         Displays information about the syntax of the JSON configuration file in a formatted way,
         along with an explanation of each field's purpose, using a custom Toplevel window.
         """
+
         json_example = {
             "Images": {"extensions": ["jpg", "png", "gif"]},
             "Documents": {"extensions": ["pdf", "docx", "txt"]},
@@ -166,46 +176,212 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
         explanation = (
             "Explanation of JSON fields:\n\n"
-            "1. Each top-level key (e.g., 'Images', 'Documents') represents a category. This category also represents the folder name.\n"
-            "2. Under each category, the 'extensions' field specifies a list of file extensions that belong to that category.\n"
+            "1. Each top-level key (e.g., 'Images', 'Documents') represents a category.\n"
+            "   This category also represents the folder name.\n"
+            "2. Under each category, the 'extensions' field specifies a list of file extensions\n"
+            "   that belong to that category.\n"
             "3. The extensions should not include the leading dot (e.g., 'jpg' not '.jpg').\n\n"
             "The application uses this configuration to sort files into the specified categories."
         )
 
         # Create a Toplevel window
         about_window = tk.Toplevel(self)
-        about_window.title("About Config")
-        about_window.geometry("600x500")
-        about_window.configure(bg="#1e1e1e")
+        about_window.title("Configuration File Syntax")
+        about_window.geometry("700x900")
+        about_window.configure(bg=self.background, padx=20, pady=20)
 
         # Title Label
         title_label = tk.Label(
             about_window,
             text="Configuration File Syntax",
-            font=("Arial", 16),
-            fg="#1e90ff",
-            bg="#1e1e1e"
+            font=("Helvetica", 18, "bold"),
+            fg=self.text,
+            bg=self.boxes,
+            padx=10,
+            pady=10,
+            relief=tk.RIDGE
         )
-        title_label.pack(pady=10)
+        title_label.pack(pady=(10, 20))
 
-        # Text widget to display JSON and explanation
-        text_area = tk.Text(about_window, wrap=tk.WORD, bg="#252526", fg="white", font=("Courier", 12))
-        text_area.insert(tk.END, "The configuration file should follow this syntax:\n\n")
-        text_area.insert(tk.END, formatted_json + "\n\n")
-        text_area.insert(tk.END, explanation)
-        text_area.config(state=tk.DISABLED)  # Make the text area read-only
-        text_area.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+        # Frame for JSON example
+        json_frame = tk.Frame(about_window, bg=self.boxes, relief=tk.GROOVE, bd=2)
+        json_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Label for JSON syntax
+        json_label = tk.Label(
+            json_frame,
+            text="JSON Syntax Example:",
+            font=("Helvetica", 14, "bold"),
+            fg="#4CAF50",  # Green text
+            bg=self.boxes,
+            anchor="w"
+        )
+        json_label.pack(fill=tk.X, padx=10, pady=(10, 5))
+
+        # Text widget to display JSON
+        json_text_area = tk.Text(
+            json_frame, wrap=tk.WORD, bg="#F5F5F5", fg="#212121", font=("Courier", 12), height=12
+        )
+        json_text_area.insert(tk.END, formatted_json)
+        json_text_area.config(state=tk.DISABLED)  # Make it read-only
+        json_text_area.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+        # Copy to Clipboard button
+        copy_button = tk.Button(
+            json_frame,
+            text="Copy JSON to Clipboard",
+            command=lambda: pyperclip.copy(formatted_json),
+            bg="#4CAF50",  # Green
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        copy_button.pack(pady=10)
+
+        # Explanation Label
+        explanation_frame = tk.Frame(about_window, bg=self.background)
+        explanation_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        explanation_label = tk.Label(
+            explanation_frame,
+            text="Explanation of Configuration:",
+            font=("Helvetica", 14, "bold"),
+            fg="#F57C00",  # Orange text
+            bg=self.background,
+            anchor="w"
+        )
+        explanation_label.pack(fill=tk.X, pady=(10, 5))
+
+        explanation_text_area = tk.Text(
+            explanation_frame, wrap=tk.WORD, bg=self.boxes, fg=self.text, font=("Arial", 12), height=8
+        )
+        explanation_text_area.insert(tk.END, explanation)
+        explanation_text_area.config(state=tk.DISABLED)  # Make it read-only
+        explanation_text_area.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
 
         # Close button
         close_button = tk.Button(
             about_window,
             text="Close",
             command=about_window.destroy,
-            bg="#1e90ff",
-            fg="black",
-            font=("Arial", 12)
+            bg="#B71C1C",  # Red
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        close_button.pack(pady=(10, 20))
+
+    def about_config(self):
+        """
+        Displays information about uploading a custom config with a more engaging and visually appealing UI.
+        """
+        # Create a new Toplevel window
+        about_window = tk.Toplevel(self)
+        about_window.title("About Uploading Configurations")
+        about_window.geometry("550x600")
+        about_window.configure(bg=self.background, padx=20, pady=20)
+
+        # Title Label
+        title_label = tk.Label(
+            about_window,
+            text="Uploading a Custom Configuration",
+            font=("Helvetica", 18, "bold"),
+            fg="#4CAF50",  # Green color for emphasis
+            bg=self.background
+        )
+        title_label.pack(pady=(10, 20))
+
+        # Explanation Text
+        explanation = (
+            "You can upload your own configuration file to specify how files "
+            "should be sorted into categories. Follow the steps below to ensure "
+            "the configuration is correct."
+        )
+
+        explanation_label = tk.Label(
+            about_window,
+            text=explanation,
+            font=("Arial", 12),
+            fg=self.text,
+            bg=self.background,
+            wraplength=500,
+            justify=tk.LEFT,
+            anchor="nw"
+        )
+        explanation_label.pack(pady=(5, 15), fill=tk.BOTH)
+
+        # Instructions Section
+        instructions_label = tk.Label(
+            about_window,
+            text="Instructions:",
+            font=("Arial", 14, "bold"),
+            fg="#F57C00",  # Orange to highlight the instructions
+            bg=self.background,
+            anchor="w"
+        )
+        instructions_label.pack(fill=tk.X, pady=(10, 5))
+
+        # Instruction Steps
+        instructions_message = (
+            "1. Open the menu \"Config Syntax\" and read it carefully.\n"
+            "2. Create a new JSON file with the same syntax as specified.\n"
+            "3. Upload the new JSON file.\n"
+        )
+
+        instructions_text = tk.Label(
+            about_window,
+            text=instructions_message,
+            font=("Courier", 11),  # Monospace for clear steps
+            fg=self.text,
+            bg=self.boxes,
+            justify=tk.LEFT,
+            anchor="nw",
+            wraplength=500
+        )
+        instructions_text.pack(pady=(5, 15), padx=10, fill=tk.BOTH)
+
+        # Revert Section
+        revert_message = (
+            "Did something wrong? No worries! You can always revert to the default configuration."
+        )
+
+        revert_label = tk.Label(
+            about_window,
+            text=revert_message,
+            font=("Arial", 12, "italic"),
+            fg="#9E9E9E",  # Grey for subtlety
+            bg=self.background,
+            wraplength=500,
+            justify=tk.LEFT,
+            anchor="nw"
+        )
+        revert_label.pack(pady=(5, 20), fill=tk.BOTH)
+
+        # Close Button
+        close_button = tk.Button(
+            about_window,
+            text="Close",
+            command=about_window.destroy,
+            bg="#B71C1C",  # Red for attention
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
         )
         close_button.pack(pady=10)
+
+
+    #
+    # CUSTOM SOURCE / DESTINATION
+    #
 
     def add_custom_source(self):
         """
@@ -249,95 +425,114 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
     def about_paths(self):
         """
-        Displays information about configuring custom paths and lists the default paths.
+        Displays information about configuring custom paths and lists the default paths
+        with an enhanced UI for better readability and style.
         """
-        about_message = (
-            "You can specify custom source and destination paths.\n\n"
-            "Default Paths:\n"
-            "1. Source Paths (where your files are located):\n"
+        # Create a new Toplevel window
+        about_window = tk.Toplevel(self)
+        about_window.title("About Path Configuration")
+        about_window.geometry("550x600")
+        about_window.configure(bg=self.background, padx=20, pady=20)
+
+        # Title Label
+        title_label = tk.Label(
+            about_window,
+            text="Path Configuration Guide",
+            font=("Helvetica", 18, "bold"),
+            fg="#4CAF50",  # Green for title
+            bg=self.background
+        )
+        title_label.pack(pady=(10, 20))
+
+        # Explanation Section
+        explanation = (
+            "You can specify custom source and destination paths to organize your files. "
+            "Below are the default paths configured in the application."
+        )
+
+        explanation_label = tk.Label(
+            about_window,
+            text=explanation,
+            font=("Arial", 12),
+            fg=self.text,
+            bg=self.background,
+            wraplength=500,
+            justify=tk.LEFT,
+            anchor="nw"
+        )
+        explanation_label.pack(pady=(5, 15), fill=tk.BOTH)
+
+        # Default Paths Section
+        default_paths_label = tk.Label(
+            about_window,
+            text="Default Paths:",
+            font=("Arial", 14, "bold"),
+            fg="#F57C00",  # Orange to emphasize
+            bg=self.background,
+            anchor="w"
+        )
+        default_paths_label.pack(fill=tk.X, pady=(10, 5))
+
+        # Path Details
+        paths_message = (
+            f"1. **Source Paths** (where your files are located):\n"
             f"   - Desktop: {self.allowed_sources['Desktop']}\n"
-            f"   - Downloads: {self.allowed_sources['Downloads']}\n"
-            "2. Destination Path (where the sorted files will be moved to):\n"
-            f"   - Documents folder\n\n"
-            "You can modify these paths to suit your preferences. Ensure that the paths are correctly set to avoid file loss."
+            f"   - Downloads: {self.allowed_sources['Downloads']}\n\n"
+            f"2. **Destination Path** (where the sorted files will be moved to):\n"
+            f"   - Documents folder"
         )
-        messagebox.showinfo("About Path Configuration", about_message)
 
-    def show_about(self):
-        """
-        Displays information about the DeskSave application, including the version.
-        Retrieves the version from the environment variable APP_VERSION set during the build process.
-        """
-        app_version = os.getenv("APP_VERSION", "NO_OFFICIAL_RELEASE") # Defaults to NOR if not run from the official executables
-
-        about_message = (
-            f"DeskSave Application\n\n"
-            f"Version {app_version}\n"
-            "A simple file organization tool for sorting files into predefined categories based on their extensions.\n"
-            "Developed by Lars Kühn."
+        paths_label = tk.Label(
+            about_window,
+            text=paths_message,
+            font=("Courier", 11),  # Monospace for paths
+            fg=self.text,
+            bg=self.boxes,
+            justify=tk.LEFT,
+            anchor="nw",
+            wraplength=500
         )
-        messagebox.showinfo("About DeskSave", about_message)
+        paths_label.pack(pady=(5, 20), padx=10, fill=tk.BOTH)
+
+        # Add a tip
+        tip_label = tk.Label(
+            about_window,
+            text="Tip: Ensure your custom paths are valid to prevent errors during file organization.",
+            font=("Arial", 10, "italic"),
+            fg="#9E9E9E",  # Grey for subtlety
+            bg=self.background,
+            wraplength=500,
+            justify=tk.LEFT,
+            anchor="w"
+        )
+        tip_label.pack(pady=(5, 20))
+
+        # Close Button
+        close_button = tk.Button(
+            about_window,
+            text="Close",
+            command=about_window.destroy,
+            bg="#B71C1C",  # Red for emphasis
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        close_button.pack(pady=10)
+
+    #
+    # Ignoring data
+    # 
 
     def ignore_data(self):
         """
-        Opens a dialog to manage the ignore files and folders. 
+        Opens a dialog to manage the ignore files and folders.
         It allows the user to add new files/folders to ignore and revert to the default ignore settings.
         """
-        # Create a new window for managing ignore data
-        ignore_window = tk.Toplevel(self)
-        ignore_window.title("Manage Ignore Files and Folders")
-        ignore_window.geometry("400x300")
-        ignore_window.configure(bg="#1e1e1e")
-
-        # Instructions Label
-        instructions_label = tk.Label(
-            ignore_window,
-            text="Manage the files and folders to ignore.",
-            font=("Arial", 12),
-            fg="white",
-            bg="#1e1e1e"
-        )
-        instructions_label.pack(pady=10)
-
-        # Ignore files entry
-        ignore_files_label = tk.Label(
-            ignore_window,
-            text="Ignore Files (comma separated):",
-            font=("Arial", 12),
-            fg="white",
-            bg="#1e1e1e"
-        )
-        ignore_files_label.pack(pady=5)
-
-        ignore_files_entry = tk.Entry(
-            ignore_window,
-            width=40,
-            font=("Arial", 12)
-        )
-        ignore_files_entry.insert(tk.END, ', '.join(self.ignore_files))  # Pre-fill with existing ignore files
-        ignore_files_entry.pack(pady=5)
-
-        # Ignore folders entry
-        ignore_folders_label = tk.Label(
-            ignore_window,
-            text="Ignore Folders (comma separated):",
-            font=("Arial", 12),
-            fg="white",
-            bg="#1e1e1e"
-        )
-        ignore_folders_label.pack(pady=5)
-
-        ignore_folders_entry = tk.Entry(
-            ignore_window,
-            width=40,
-            font=("Arial", 12)
-        )
-        ignore_folders_entry.insert(tk.END, ', '.join(self.ignore_folders))  # Pre-fill with existing ignore folders
-        ignore_folders_entry.pack(pady=5)
-
-        # Add new ignore entries
-        
-        def save_data():
+        # Functionality
+        def save_ignore_data():
             """Saves the ignore data (files and folders) to the ignore JSON file."""
             # Get the new ignore files and folders from the input fields
             new_ignore_files = ignore_files_entry.get().split(',') if ignore_files_entry.get() else []
@@ -364,18 +559,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
             ignore_window.destroy()
 
-        save_button = tk.Button(
-            ignore_window,
-            text="Save Changes",
-            command=save_data,
-            bg="#1e90ff",
-            fg="black",
-            font=("Arial", 12)
-        )
-        save_button.pack(pady=10)
-
-        # Revert to default button
-        def revert_to_default():
+        def revert_ignore_to_default():
             """
             Reverts the ignore settings to their default values and updates the JSON file.
             """
@@ -416,53 +600,421 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
                     messagebox.showinfo("Reverted to Default", "The ignore settings have been reset to the default values.")
                 except Exception as e: # pylint: disable=broad-exception-caught
                     messagebox.showerror("Error", f"An error occurred while reverting to the default settings: {e}")
+        
+        # UI
+        # Create a new window for managing ignore data
+        ignore_window = tk.Toplevel(self)
+        ignore_window.title("Manage Ignore Files and Folders")
+        ignore_window.geometry("450x350")
+        ignore_window.configure(bg=self.background)
 
-
-
-        revert_button = tk.Button(
+        # Header Label
+        header_label = tk.Label(
             ignore_window,
-            text="Revert to Default",
-            command=revert_to_default,
-            bg="white",
-            fg="black",
-            font=("Arial", 12)
+            text="Manage Ignore Files and Folders",
+            font=("Helvetica", 16, "bold"),
+            fg=self.text,
+            bg=self.background
         )
-        revert_button.pack(pady=10)
+        header_label.pack(pady=(20, 10))
+
+        # Instructions Label
+        instructions_label = tk.Label(
+            ignore_window,
+            text="Specify files and folders to ignore during organization.",
+            font=("Arial", 12),
+            fg=self.text,
+            bg=self.background
+        )
+        instructions_label.pack(pady=(5, 15))
+
+        # Ignore Files Label and Entry
+        ignore_files_label = tk.Label(
+            ignore_window,
+            text="Ignore Files (comma-separated):",
+            font=("Arial", 12, "bold"),
+            fg=self.text,
+            bg=self.background,
+            anchor="w"
+        )
+        ignore_files_label.pack(fill=tk.X, padx=20, pady=5)
+
+        ignore_files_entry = tk.Entry(
+            ignore_window,
+            width=50,
+            font=("Arial", 12),
+            bg=self.boxes,
+            fg=self.text,
+            relief=tk.GROOVE
+        )
+        ignore_files_entry.insert(tk.END, ', '.join(self.ignore_files))
+        ignore_files_entry.pack(fill=tk.X, padx=20, pady=5)
+
+        # Ignore Folders Label and Entry
+        ignore_folders_label = tk.Label(
+            ignore_window,
+            text="Ignore Folders (comma-separated):",
+            font=("Arial", 12, "bold"),
+            fg=self.text,
+            bg=self.background,
+            anchor="w"
+        )
+        ignore_folders_label.pack(fill=tk.X, padx=20, pady=5)
+
+        ignore_folders_entry = tk.Entry(
+            ignore_window,
+            width=50,
+            font=("Arial", 12),
+            bg=self.boxes,
+            fg=self.text,
+            relief=tk.GROOVE
+        )
+        ignore_folders_entry.insert(tk.END, ', '.join(self.ignore_folders))
+        ignore_folders_entry.pack(fill=tk.X, padx=20, pady=5)
+
+        # Button Frame for alignment
+        button_frame = tk.Frame(ignore_window, bg=self.background)
+        button_frame.pack(pady=20)
+
+        # Save Button
+        save_button = tk.Button(
+            button_frame,
+            text="Save Changes",
+            command=save_ignore_data,
+            bg="#4CAF50",  # Green
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        save_button.grid(row=0, column=0, padx=10)
+
+        # Revert to Default Button
+        revert_button = tk.Button(
+            button_frame,
+            text="Revert to Default",
+            command=revert_ignore_to_default,
+            bg="#F57C00",  # Orange
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        revert_button.grid(row=0, column=1, padx=10)
 
         # Close Button
         close_button = tk.Button(
-            ignore_window,
+            button_frame,
             text="Close",
             command=ignore_window.destroy,
-            bg="#1e90ff",
-            fg="black",
-            font=("Arial", 12)
+            bg="#B71C1C",  # Red
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        close_button.grid(row=0, column=2, padx=10)
+
+        # Footer Label
+        footer_label = tk.Label(
+            ignore_window,
+            text="Tip: Use commas to separate entries (e.g., file1.txt, file2.txt).",
+            font=("Arial", 10, "italic"),
+            fg="#9E9E9E",
+            bg=self.background
+        )
+        footer_label.pack(pady=(5, 10))
+
+    def about_ignoring(self):
+        """
+        Opens a custom window with information on how to ignore files and folders.
+        Provides a detailed explanation with a visually appealing layout.
+        """
+        # Create a new Toplevel window
+        about_window = tk.Toplevel(self)
+        about_window.title("About Ignoring Files and Folders")
+        about_window.geometry("550x600")
+        about_window.configure(bg=self.background, padx=20, pady=20)
+
+        # Title Label
+        title_label = tk.Label(
+            about_window,
+            text="Ignoring Files and Folders",
+            font=("Helvetica", 18, "bold"),
+            fg="#4CAF50",  # Green text
+            bg=self.background
+        )
+        title_label.pack(pady=(10, 20))
+
+        # Explanation Text
+        explanation = (
+            "You can specify files and folders that the file organizer should ignore.\n\n"
+            "This allows you to prevent certain items from being moved or modified during file organization.\n\n"
+            "Your configuration is saved locally on your machine, ensuring privacy and ease of use. "
+            "You can also revert to the default ignore settings at any time."
+        )
+
+        explanation_label = tk.Label(
+            about_window,
+            text=explanation,
+            font=("Arial", 12),
+            fg=self.text,
+            bg=self.background,
+            wraplength=460,  # Limit the text width
+            justify=tk.LEFT,
+            anchor="nw"
+        )
+        explanation_label.pack(pady=10, fill=tk.BOTH, expand=True)
+
+        # Add an icon or tip (optional)
+        tip_label = tk.Label(
+            about_window,
+            text="Tip: Use the ignore settings to exclude system files or frequently used directories!",
+            font=("Arial", 10, "italic"),
+            fg="#F57C00",  # Orange text
+            bg=self.background,
+            anchor="w",
+            wraplength=460,
+            justify=tk.LEFT
+        )
+        tip_label.pack(pady=(5, 20))
+
+        # Close Button
+        close_button = tk.Button(
+            about_window,
+            text="Close",
+            command=about_window.destroy,
+            bg="#B71C1C",  # Red
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        close_button.pack(pady=10)
+    
+    #
+    # About
+    #
+
+    def show_about(self):
+        """
+        Displays information about the DeskSave application, including the version,
+        in a visually engaging way using a custom Toplevel window.
+        """
+        app_version = os.getenv("APP_VERSION", "NO_OFFICIAL_RELEASE")  # Default version if not from official build
+
+        # About message
+        about_message = (
+            f"DeskSave Application\n\n"
+            f"Version {app_version}\n"
+            "A simple file organization tool for sorting files into predefined categories based on their extensions.\n"
+            "Developed by Lars Kühn."
+        )
+
+        # Create a Toplevel window for the "About" dialog
+        about_window = tk.Toplevel(self)
+        about_window.title("About DeskSave")
+        about_window.geometry("550x600")
+        about_window.configure(bg=self.background, padx=20, pady=20)
+
+        # Title Label
+        title_label = tk.Label(
+            about_window,
+            text="DeskSave Application",
+            font=("Helvetica", 18, "bold"),
+            fg="#4CAF50",  # Green for a fresh and professional feel
+            bg=self.background
+        )
+        title_label.pack(pady=(20, 10))
+
+        # Version Label
+        version_label = tk.Label(
+            about_window,
+            text=f"Version {app_version}",
+            font=("Arial", 14, "italic"),
+            fg="#FF9800",  # Orange to highlight the version number
+            bg=self.background
+        )
+        version_label.pack(pady=5)
+
+        # Description Label
+        description_label = tk.Label(
+            about_window,
+            text="A simple file organization tool for sorting files based on extensions.",
+            font=("Arial", 12),
+            fg=self.text,
+            bg=self.background,
+            wraplength=450,
+            justify=tk.CENTER
+        )
+        description_label.pack(pady=(10, 20))
+
+        # Developer Info
+        developer_label = tk.Label(
+            about_window,
+            text="Developed by Lars Kühn",
+            font=("Arial", 12, "bold"),
+            fg="#9E9E9E",  # Grey for subtle and professional touch
+            bg=self.background
+        )
+        developer_label.pack(pady=10)
+
+        # About Message Text Area (remove redundant label)
+        about_text_area = tk.Label(
+            about_window,
+            text=about_message,
+            font=("Courier", 11),
+            fg=self.text,
+            bg=self.background,
+            justify=tk.LEFT,
+            anchor="nw",
+            wraplength=450
+        )
+        about_text_area.pack(pady=(10, 20))  # This replaces the label that previously doubled the text
+
+        # Close Button
+        close_button = tk.Button(
+            about_window,
+            text="Close",
+            command=about_window.destroy,
+            bg="#B71C1C",  # Red to stand out
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.RAISED,
+            bd=2,
+            padx=10,
+            pady=5
         )
         close_button.pack(pady=10)
 
-    def about_ignoring(self):
-        """This functions opens a Messagebox with information on how to ignore files and folders."""
+
+    #
+    # UI Helper Functions
+    #
+
+    def log_progress(self, message):
+        """
+        Logs progress in the progress text box.
+        """
+        self.progress_text_box.config(state=tk.NORMAL)
+        self.progress_text_box.insert(tk.END, f"{message}\n")
+        self.progress_text_box.config(state=tk.DISABLED)
+
+    def update_source_dropdown(self):
+        """
+        Updates the source dropdown menu after a new source is added.
+        """
+        self.source_combobox['values'] = list(self.allowed_sources.values())
+        self.source_combobox.set(list(self.allowed_sources.values())[-1])
+
+    #
+    # Create widgets
+    #
 
     def create_widgets(self):
         """
-        Creates the main widgets for the GUI.
+        Creates the main widgets for the GUI with enhanced visual design.
         """
-        # Source dropdown
-        self.source_label = tk.Label(self, text="Select Source Folder:", font=("Arial", 14), fg="white", bg="#1e1e1e")
-        self.source_label.pack(pady=10)
+        # Header Label
+        header_label = tk.Label(
+            self,
+            text="DeskSave File Organizer",
+            font=("Helvetica", 20, "bold"),
+            fg=self.text,
+            bg=self.background
+        )
+        header_label.pack(pady=(20, 10))
 
-        # Display the full paths in the dropdown
-        self.source_combobox = ttk.Combobox(self, values=list(self.allowed_sources.values()), state="readonly")
-        self.source_combobox.pack(pady=10)
+        # Source Dropdown Label
+        self.source_label = tk.Label(
+            self,
+            text="Select Source Folder:",
+            font=("Arial", 16, "bold"),
+            fg=self.text,
+            bg=self.background,
+            anchor="w"
+        )
+        self.source_label.pack(fill=tk.X, padx=20, pady=(10, 5))
+
+        # Source Dropdown Combobox
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure(
+            "TCombobox",
+            fieldbackground=self.boxes,
+            background=self.boxes,
+            foreground=self.text,
+            font=("Arial", 14)
+        )
+        self.source_combobox = ttk.Combobox(
+            self,
+            values=list(self.allowed_sources.values()),
+            state="readonly",
+            style="TCombobox"
+        )
+        self.source_combobox.pack(fill=tk.X, padx=20, pady=5)
 
         # Start Button
-        self.start_button = tk.Button(self, text="Start Organizing", command=self.organize_files, bg="#1e90ff", fg="black", font=("Arial", 14))
-        self.start_button.pack(pady=20)
+        self.start_button = tk.Button(
+            self,
+            text="Start Organizing",
+            command=self.organize_files,
+            bg=self.menu,
+            activebackground="#3D6F6F",  # Slightly darker for hover effect
+            fg=self.text,
+            font=("Arial", 16, "bold"),
+            relief=tk.RAISED,
+            bd=3
+        )
+        self.start_button.pack(fill=tk.X, padx=20, pady=(20, 10))
+
+        # Progress Text Box Label
+        progress_label = tk.Label(
+            self,
+            text="Progress Log:",
+            font=("Arial", 14, "bold"),
+            fg=self.text,
+            bg=self.background,
+            anchor="w"
+        )
+        progress_label.pack(fill=tk.X, padx=20, pady=(10, 5))
 
         # Progress Text Box
-        self.progress_text_box = tk.Text(self, height=10, width=50, state=tk.DISABLED, bg="#252526", fg="white", font=("Courier", 12))
-        self.progress_text_box.pack(pady=10)
+        self.progress_text_box = tk.Text(
+            self,
+            height=12,
+            state=tk.DISABLED,
+            bg=self.boxes,
+            fg=self.text,
+            font=("Courier", 12),
+            wrap=tk.WORD,
+            relief=tk.SUNKEN,
+            bd=2
+        )
+        self.progress_text_box.pack(fill=tk.BOTH, expand=True, padx=20, pady=(5, 20))
 
+        # Footer Label
+        footer_label = tk.Label(
+            self,
+            text="Tip: Select the folder and click 'Start Organizing' to begin!",
+            font=("Arial", 10, "italic"),
+            fg="#9E9E9E",
+            bg=self.background
+        )
+        footer_label.pack(pady=(5, 10))
+
+    #
+    # Logical functions
+    # 
+    
     def load_file_types(self):
         """
         Loads the file types from the default JSON configuration file.
@@ -507,21 +1059,6 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
             # If there's a problem decoding the JSON, use default ignore data
             print(f"Error: Failed to decode JSON from {ignore_json_path}. Using default ignore lists.")
             return default_ignore_files, default_ignore_folders
-
-    def log_progress(self, message):
-        """
-        Logs progress in the progress text box.
-        """
-        self.progress_text_box.config(state=tk.NORMAL)
-        self.progress_text_box.insert(tk.END, f"{message}\n")
-        self.progress_text_box.config(state=tk.DISABLED)
-
-    def update_source_dropdown(self):
-        """
-        Updates the source dropdown menu after a new source is added.
-        """
-        self.source_combobox['values'] = list(self.allowed_sources.values())
-        self.source_combobox.set(list(self.allowed_sources.values())[-1])
 
     def organize_files(self):
         """
