@@ -26,19 +26,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Assuming you have a requirements file that includes PyInstaller
 
-      # Step 4: Change to script directory and build executable with PyInstaller
+      # Step 4: Change to script directory and build executable with PyInstaller (onefile)
       - name: Build MacOS x86-executable with PyInstaller
         env:
           APP_VERSION: ${{ github.ref_name }}  # Pass the tag name as an environment variable
         run: |
           cd script
-          pyinstaller --name DeskSaveApp --target-arch x86_64 --noconsole --add-data "file_types.json:." --additional-hooks-dir=hooks --clean main.py
+          pyinstaller --onefile --name DeskSaveApp --target-arch x86_64 --noconsole --add-data "file_types.json:." --additional-hooks-dir=hooks --clean main.py
 
       # Step 5: Archive the application directory into a zip file
-      - name: Archive application directory
+      - name: Archive application into a zip file
         run: |
           cd script/dist
-          zip -r DeskSaveApp-macOS-x86.zip DeskSaveApp
+          zip -r DeskSaveApp-macOS-x86.zip DeskSaveApp.app  # Only archive the .app bundle
 
       # Step 6: Upload the zip archive as a release asset
       - name: Release
