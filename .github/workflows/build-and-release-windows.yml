@@ -27,10 +27,12 @@ jobs:
           pip install -r requirements.txt  # Assuming you have a requirements file that includes PyInstaller
 
       # Step 4: Change to script directory and build executable with PyInstaller
-      - name: Build Windows executable with PyInstaller
+      - name: Build MacOS executable with PyInstaller
+        env:
+          APP_VERSION: ${{ github.ref_name }}  # Pass the tag name as an environment variable
         run: |
           cd script
-          pyinstaller --name DeskSaveApp --add-data "file_types.json;." main.py
+          pyinstaller --name DeskSaveApp --noconsole --add-data "file_types.json;." --additional-hooks-dir=hooks --clean main.py
 
       # Step 5: Archive the application directory into a zip file
       - name: Archive application directory
