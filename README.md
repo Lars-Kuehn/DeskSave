@@ -1,31 +1,45 @@
 # DeskSave
-This application is able to move your files from your desktop or download folder to your Documents and structures them according to the data-type. 
 
-## What is the DeskSave capable of?
-- **Graphical User Interface**: The application is run trough an GUI.
-- **JSON configuration file**: `\script\file_types.json` contains all of the file-types that are being recognised by the application.
-- **CI/CD**: This repository contains an CI/CD pipeline that checks if all of its python code is being correct via *Pylint*.
+DeskSave is a simple yet powerful tool designed to automate the organization of files by moving them from your source directory to your destination directory. It categorizes files based on their data type and file extensions, simplifying file management and reducing clutter.
 
-## `\script`
-The python script and the JSON file lie in this directory.
+## Features
+
+- **Graphical User Interface (GUI)**: DeskSave provides a clean, user-friendly GUI to easily interact with the application.
+- **Customizable JSON Configuration File**: The application uses a `file_types.json` configuration file (located in `\script\file_types.json`) to recognize and categorize various file types. You can easily upload your own configuration file via the GUI.
+- **CI/CD Pipeline**: This repository includes a CI/CD pipeline to ensure the quality of the code through *Pylint*, maintaining clean, efficient code throughout development.
+
+## Folder Structure: `\script`
+
+This directory contains the core Python script and necessary configuration files.
+
 ### Files
-- `main.py`: Python Script with file-moving logic.
-- `file_types.json`: JSON File with all file types. You can add additional file types.
+- **`main.py`**: The Python script that handles the file-moving logic, including sorting files based on their extensions.
+- **`file_types.json`**: A JSON file that maps file extensions to categories. You can modify or extend this file by adding new file types, or upload a custom configuration via the GUI.
 
 ## Roadmap for DeskSave
-### Currently in development
-- **Select directory**: The user should be able to Source- and Destination Folder.
-- **Settings**: The user should be able to change the Settings of the application in the GUI.
 
-### Planned updates
+### Currently in Development
+- **Save File Type Configurations**: Users will soon be able to save their custom file type configurations. Unlike the "ignore" settings, file type configurations are not yet saved between sessions. Future versions will allow users to store multiple configurations and select them upon restarting the application.
 
+### Planned Updates
+- **Automated Sorting**: Plans to add an automatic sorting feature that will allow files to be organized periodically on a set schedule, without manual intervention.
 
 ## Disclaimer
-**Executables**
-With every release of DeskSave there come two exectuable files: Windows & MacOS. As this is more of a fun project, I do not have the capacities to notarize these executable files. It is quite likely that your OS will warn you, when trying to start these executable files. In that case you can also download the repository and launch the `main.py` script located in the `script` directory.
 
-**Use at Your Own Risk**  
-DeskSave is intended to help organize files, but it may delete or move files incorrectly. Users are advised to thoroughly review the configuration and backup important files before using DeskSave. The author assumes no responsibility for any loss or damage to data.
+### **Executables**
+DeskSave includes two executables with each release: one for **Windows** and one for **macOS**. Since this project is not professionally notarized, your operating system may display warnings when attempting to run these executables. If this occurs, you can always download the source code and run the `main.py` script directly from the `script` directory.
+
+### **Use at Your Own Risk**
+While DeskSave is intended to simplify file organization, users should exercise caution. There is always the potential for accidental file movement or deletion, particularly if the configuration file is not correctly set up. **Always back up important files before using DeskSave**, and double-check your configuration settings. The author assumes no responsibility for any data loss or other issues caused by using this tool.
 
 ## Author
-Lars Kühn [https://github.com/Lars-Kuehn]
+Lars Kühn  
+[GitHub Profile](https://github.com/Lars-Kuehn)
+
+---
+
+### Recent Changes:
+- **Enhanced GUI**: Users can now select both source and destination folders within the GUI.
+- **Progress Log**: A new progress log tracks and displays which files have been moved during the sorting process.
+- **Custom Configuration Upload**: Users can upload their own configuration file to define which file types should be moved and how they should be categorized.
+- **File & Folder Ignore Settings**: Users can specify files and folders to ignore in the application settings, ensuring certain files are excluded from the sorting process.
