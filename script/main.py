@@ -359,7 +359,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
                         indent=4
                     )
                 messagebox.showinfo("Data Saved", "Ignore data updated successfully!")
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-exception-caught
                 messagebox.showerror("Error", f"An error occurred: {e}")
 
             ignore_window.destroy()
@@ -414,7 +414,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
                     ignore_folders_entry.insert(tk.END, ', '.join(self.ignore_folders))  # Insert default ignore folders
 
                     messagebox.showinfo("Reverted to Default", "The ignore settings have been reset to the default values.")
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-exception-caught
                     messagebox.showerror("Error", f"An error occurred while reverting to the default settings: {e}")
 
 
@@ -441,7 +441,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         close_button.pack(pady=10)
 
     def about_ignoring(self):
-        print("about ignoreping")
+        """This functions opens a Messagebox with information on how to ignore files and folders."""
 
     def create_widgets(self):
         """
