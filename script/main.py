@@ -37,6 +37,7 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         # Initialize the default JSON configuration path
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.default_json_path = os.path.join(self.script_dir, 'file_types.json')
+        self.default_ignore_json_path = os.path.join(self.script_dir, 'ignore.json')
         self.custom_json_path = None  # Holds the path to the custom JSON file if uploaded
 
         # Load file types
@@ -48,6 +49,9 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
             'Desktop': f'/Users/{self.user}/Desktop',
             'Downloads': f'/Users/{self.user}/Downloads'
         }
+
+        # Initalize Ignoring of Files and Folders
+        self.ignore_files, self.ignore_folders = self.load_ignore_json()
 
         # Initialize custom destination path
         self.custom_destination_path = None
@@ -85,9 +89,15 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         path_menu.add_command(label="Change Destination-Path", command=self.change_destination)
         path_menu.add_command(label="About Changing Paths", command=self.about_paths)
 
+        # Ignore Submenu
+        ignore_menu = tk.Menu(settings_menu, tearoff=0)
+        ignore_menu.add_command(label="Ignore Files & Folders", command=self.ignore_data)
+        ignore_menu.add_command(label="About Ignoring", command=self.about_ignoring)
+
         # Add Submenus to Settings
         settings_menu.add_cascade(label="File Configuration", menu=config_menu)
         settings_menu.add_cascade(label="Path Configuration", menu=path_menu)
+        settings_menu.add_cascade(label="Ignore Configuration", menu=ignore_menu)
 
         # Add Settings to Menu Bar
         menu_bar.add_cascade(label="Settings", menu=settings_menu)
@@ -102,7 +112,6 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
         # Attach Menu Bar to the App
         self.config(menu=menu_bar)
-
 
     def upload_custom_config(self):
         """
@@ -269,6 +278,170 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
         )
         messagebox.showinfo("About DeskSave", about_message)
 
+    def ignore_data(self):
+        """
+        Opens a dialog to manage the ignore files and folders. 
+        It allows the user to add new files/folders to ignore and revert to the default ignore settings.
+        """
+        # Create a new window for managing ignore data
+        ignore_window = tk.Toplevel(self)
+        ignore_window.title("Manage Ignore Files and Folders")
+        ignore_window.geometry("400x300")
+        ignore_window.configure(bg="#1e1e1e")
+
+        # Instructions Label
+        instructions_label = tk.Label(
+            ignore_window,
+            text="Manage the files and folders to ignore.",
+            font=("Arial", 12),
+            fg="white",
+            bg="#1e1e1e"
+        )
+        instructions_label.pack(pady=10)
+
+        # Ignore files entry
+        ignore_files_label = tk.Label(
+            ignore_window,
+            text="Ignore Files (comma separated):",
+            font=("Arial", 12),
+            fg="white",
+            bg="#1e1e1e"
+        )
+        ignore_files_label.pack(pady=5)
+
+        ignore_files_entry = tk.Entry(
+            ignore_window,
+            width=40,
+            font=("Arial", 12)
+        )
+        ignore_files_entry.insert(tk.END, ', '.join(self.ignore_files))  # Pre-fill with existing ignore files
+        ignore_files_entry.pack(pady=5)
+
+        # Ignore folders entry
+        ignore_folders_label = tk.Label(
+            ignore_window,
+            text="Ignore Folders (comma separated):",
+            font=("Arial", 12),
+            fg="white",
+            bg="#1e1e1e"
+        )
+        ignore_folders_label.pack(pady=5)
+
+        ignore_folders_entry = tk.Entry(
+            ignore_window,
+            width=40,
+            font=("Arial", 12)
+        )
+        ignore_folders_entry.insert(tk.END, ', '.join(self.ignore_folders))  # Pre-fill with existing ignore folders
+        ignore_folders_entry.pack(pady=5)
+
+        # Add new ignore entries
+        
+        def save_ignore_data(self):
+            """Saves the ignore data (files and folders) to the ignore JSON file."""
+            # Get the new ignore files and folders from the input fields
+            new_ignore_files = ignore_files_entry.get().split(',') if ignore_files_entry.get() else []
+            new_ignore_folders = ignore_folders_entry.get().split(',') if ignore_folders_entry.get() else []
+
+            # Clean up any extra spaces
+            self.ignore_files = [item.strip() for item in new_ignore_files]
+            self.ignore_folders = [item.strip() for item in new_ignore_folders]
+
+            # Get the path for the ignore.json file (in the same directory as the executable)
+            ignore_json_path = self.get_ignore_json_path()
+            
+            try:
+                # Write the updated ignore data to the ignore.json file
+                with open(ignore_json_path, 'w', encoding='UTF-8') as json_file:
+                    json.dump(
+                        {"ignore_files": self.ignore_files, "ignore_folders": self.ignore_folders},
+                        json_file,
+                        indent=4
+                    )
+                messagebox.showinfo("Data Saved", "Ignore data updated successfully!")
+            except Exception as e: # pylint: disable=broad-exception-caught
+                messagebox.showerror("Error", f"An error occurred: {e}")
+
+            ignore_window.destroy()
+
+        save_button = tk.Button(
+            ignore_window,
+            text="Save Changes",
+            command=save_ignore_data,
+            bg="#1e90ff",
+            fg="black",
+            font=("Arial", 12)
+        )
+        save_button.pack(pady=10)
+
+        # Revert to default button
+        def revert_to_default(self):
+            """
+            Reverts the ignore settings to their default values and updates the JSON file.
+            """
+            # Default ignore files and folders
+            default_ignore_files = [".DS_Store"]
+            default_ignore_folders = ["DeskSaveApp", "DeskSave"]
+            
+            # Confirm the revert action with the user
+            confirmation = messagebox.askyesno(
+                "Revert to Default",
+                "Are you sure you want to revert the ignore settings to the default values?"
+            )
+
+            if confirmation:
+                try:
+                    # Update the ignore files and folders in the app
+                    self.ignore_files = default_ignore_files
+                    self.ignore_folders = default_ignore_folders
+                    
+                    # Get the path for the ignore.json file (in the same directory as the executable)
+                    ignore_json_path = self.get_ignore_json_path()
+                    
+                    # Write the default settings back to the ignore.json file
+                    with open(ignore_json_path, 'w', encoding='UTF-8') as json_file:
+                        json.dump(
+                            {"ignore_files": default_ignore_files, "ignore_folders": default_ignore_folders},
+                            json_file,
+                            indent=4
+                        )
+                    
+                    # Update the entry fields to reflect the new default values
+                    ignore_files_entry.delete(0, tk.END)  # Clear the existing content
+                    ignore_files_entry.insert(tk.END, ', '.join(self.ignore_files))  # Insert default ignore files
+                    
+                    ignore_folders_entry.delete(0, tk.END)  # Clear the existing content
+                    ignore_folders_entry.insert(tk.END, ', '.join(self.ignore_folders))  # Insert default ignore folders
+
+                    messagebox.showinfo("Reverted to Default", "The ignore settings have been reset to the default values.")
+                except Exception as e: # pylint: disable=broad-exception-caught
+                    messagebox.showerror("Error", f"An error occurred while reverting to the default settings: {e}")
+
+
+
+        revert_button = tk.Button(
+            ignore_window,
+            text="Revert to Default",
+            command=revert_to_default,
+            bg="white",
+            fg="black",
+            font=("Arial", 12)
+        )
+        revert_button.pack(pady=10)
+
+        # Close Button
+        close_button = tk.Button(
+            ignore_window,
+            text="Close",
+            command=ignore_window.destroy,
+            bg="#1e90ff",
+            fg="black",
+            font=("Arial", 12)
+        )
+        close_button.pack(pady=10)
+
+    def about_ignoring(self):
+        """This functions opens a Messagebox with information on how to ignore files and folders."""
 
     def create_widgets(self):
         """
@@ -304,6 +477,37 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
             messagebox.showerror("Error", "Configuration file is invalid.")
             sys.exit()
 
+    def get_ignore_json_path(self):
+        """Returns the correct path for ignore.json based on the executable's directory."""
+        # Get the directory where the executable is located
+        executable_dir = os.path.dirname(sys.executable)  # This is the directory of the executable
+        ignore_json_path = os.path.join(executable_dir, 'ignore.json')
+        return ignore_json_path
+
+    def load_ignore_json(self):
+        """Loads the ignore JSON file and returns ignore files and folders."""
+        ignore_json_path = self.get_ignore_json_path()
+
+        # Default ignore data (hardcoded in the script)
+        default_ignore_files = [".DS_Store"]
+        default_ignore_folders = ["DeskSaveApp", "DeskSave"]
+        
+        try:
+            # Try to load the ignore data from the user's file system
+            with open(ignore_json_path, 'r', encoding='UTF-8') as f:
+                ignore_data = json.load(f)
+                ignore_files = ignore_data.get('ignore_files', default_ignore_files)
+                ignore_folders = ignore_data.get('ignore_folders', default_ignore_folders)
+                return ignore_files, ignore_folders
+        except FileNotFoundError:
+            # If the file doesn't exist, return default ignore data
+            print(f"Warning: {ignore_json_path} not found. Using default ignore lists.")
+            return default_ignore_files, default_ignore_folders
+        except json.JSONDecodeError:
+            # If there's a problem decoding the JSON, use default ignore data
+            print(f"Error: Failed to decode JSON from {ignore_json_path}. Using default ignore lists.")
+            return default_ignore_files, default_ignore_folders
+
     def log_progress(self, message):
         """
         Logs progress in the progress text box.
@@ -336,36 +540,34 @@ class DeskSaveApp(tk.Tk): # pylint: disable=too-many-instance-attributes
 
         if selected_source:
             self.log_progress(f"Organizing files from: {selected_source}")
-            skip_files = ['.DS_Store', 'README.md']
-            skip_folders = ['DeskSave', 'Downloads', 'Documents']
         
-            self.move_files(selected_source, destination, self.file_types, skip_files, skip_folders)
+            self.move_files(selected_source, destination, self.file_types, self.ignore_files, self.ignore_folders)
             self.log_progress("Files have been organized successfully!")
         else:
             messagebox.showerror("Error", "Invalid source folder.")
 
-    def move_files(self, source, destination, file_types, skip_files, skip_folders):
+    def move_files(self, source, destination, file_types, ignore_files, ignore_folders):
         """
         Moves and organizes files from the source directory to the destination directory,
         categorizing them based on their file types and the configuration specified in
         'file_types.json'.
 
         Files and folders can be excluded from the organization process based on the
-        `skip_files` and `skip_folders` lists. After moving files, it attempts to delete
+        `ignore_files` and `ignore_folders` lists. After moving files, it attempts to delete
         any empty folders left in the source directory.
         """
         
         for item in os.listdir(source):
             full_path = os.path.join(source, item)
             
-            # Skip folders that are in the skip list
-            if os.path.isdir(full_path) and item in skip_folders:
-                self.log_progress(f"Skipping folder: {item}")
+            # ignore folders that are in the ignore list
+            if os.path.isdir(full_path) and item in ignore_folders:
+                self.log_progress(f"Ignoring folder: {item}")
                 continue
             
-            # Skip files that are in the skip list or hidden files (e.g., .DS_Store)
-            if item in skip_files or item.startswith('.'):
-                self.log_progress(f"Skipping file: {item}")
+            # ignore files that are in the ignore list or hidden files (e.g., .DS_Store)
+            if item in ignore_files or item.startswith('.'):
+                self.log_progress(f"Ignoring file: {item}")
                 continue
             
             # Process directories: move their contents to the appropriate file type folder
